@@ -1,0 +1,22 @@
+{
+  "name": "getebook-refined",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "api": "node --env-file-if-exists=.env server/index.js",
+    "test": "node --test src/*.test.js server/*.test.js"
+  },
+  "dependencies": {
+    "fflate": "0.8.3",
+    "lucide-react": "0.468.0",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "devDependencies": {
+    "vite": "7.3.8"
+  }
+}
