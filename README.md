@@ -29,6 +29,10 @@ Keep `npm run api` running for both dev and production preview. Vite proxies `/a
 
 Default model: `openai/gpt-4.1-mini`, configurable with server-side `OPENROUTER_MODEL`. The server uses the documented [OpenRouter chat-completions API](https://openrouter.ai/docs/api/api-reference/chat/send-chat-completion-request). Generation costs use the owner’s API balance; there is no subscription checkout.
 
+Artwork uses the documented [OpenRouter Image API](https://openrouter.ai/docs/guides/overview/multimodal/image-generation), requesting one medium-quality JPEG at a time. Configure `OPENROUTER_IMAGE_MODEL` and `IMAGE_REQUEST_LIMIT` on the server only. In the manuscript editor, set art direction and generate a portrait cover or an illustration for the selected chapter. Regeneration is opt-in, never an automatic retry; failed requests keep existing artwork. Cancelling does not guarantee the provider avoids charging. Art is stored separately in IndexedDB; download a backup of the illustrated book before clearing browser data. PDF/DOCX libraries are loaded only when an export is requested.
+
+Direct publishing requires a selected destination and an authenticated integration. Nothing is automatically uploaded or listed for sale. For Amazon KDP, the official [upload workflow](https://kdp.amazon.com/en_US/help/topic/G200735480) uses the KDP Bookshelf and previewer; our PDF is an A4 review copy, not a trim/bleed-configured paperback interior. Check platform-specific cover dimensions, author metadata, AI disclosures, accessibility, rights, and previewer results before submitting.
+
 ## What works
 
 - Responsive navigation, anchor links, prompt suggestions, and input validation.
@@ -37,18 +41,18 @@ Default model: `openai/gpt-4.1-mini`, configurable with server-side `OPENROUTER_
 - Visible progress, cancellation, automatic local save after every chapter, and resume of missing chapters without overwriting paid-for chapters or author edits. Provider errors are surfaced; generation never silently substitutes a template.
 - An explicitly labeled offline starter-template option is retained.
 - Save and reopen multiple drafts in browser local storage; delete with confirmation.
-- Download edited manuscripts as plain-text `.txt`; completed AI books also export EPUB3 with a typographic title page, table of contents, metadata, and six chapter documents.
+- Download edited manuscripts as plain-text `.txt`; completed AI books export EPUB3, PDF, and editable DOCX with a title page, contents, and six chapters, plus optional cover and chapter artwork.
 - Credit-plan selection, honest non-payment plan dialog, accessible FAQ accordion, keyboard-operable dialogs, and reduced-motion support.
 
 ## Deliberate boundaries
 
-This is an independent private-preview replica, not the original getebook.ai backend. AI text generation is connected through OpenRouter. Authentication, payments, cover/illustration generation, cloud sync, PDF/DOCX export, and direct publishing are not connected. EPUB exports use a typographic title page, not an AI-generated image. All AI output needs editorial review and fact-checking before publication; a complete manuscript is not a guarantee of publication quality or factual accuracy.
+This is an independent private-preview replica, not the original getebook.ai backend. AI text generation is connected through OpenRouter. Authentication, payments, cloud sync, and direct publishing are not connected. Cover and chapter artwork use the OpenRouter Image API with OpenAI’s `openai/gpt-5-image-mini` by default. Completed AI manuscripts export EPUB, PDF, and DOCX with saved artwork. These are review copies, not certified print-ready files or automatic marketplace submissions. All AI output needs editorial review and fact-checking before publication; a complete manuscript is not a guarantee of publication quality or factual accuracy.
 
-Your idea, audience, outline, and relevant chapter text are sent to OpenRouter and its selected model provider. Avoid confidential inputs. Saved books stay in the current browser, with no cloud backup. Download a copy before clearing storage.
+Your idea, audience, outline, and relevant chapter text are sent to OpenRouter and its selected model provider. Avoid confidential inputs. Saved manuscripts use localStorage; artwork uses IndexedDB in the same browser to avoid localStorage’s small quota. There is no cloud backup. Artwork is loaded from IndexedDB when previewing or exporting; missing artwork produces a recoverable export error rather than silently omitting it. Download a copy before clearing storage.
 
 ### Private-preview safeguards
 
-The API binds to `127.0.0.1`, accepts only the two generation routes, validates inputs, requires same-origin JSON requests with a custom client header, caps requests at 70 per hour across the process and two concurrently, limits output tokens and request size, times out provider calls, and cancels disconnected requests. The key is sent only from the server to OpenRouter, never to the browser. Error messages do not echo upstream payloads or credentials.
+The API binds to `127.0.0.1`, accepts only the outline, chapter, and artwork generation routes, validates inputs, requires same-origin JSON requests with a custom client header, caps requests at 70 per hour across the process and two concurrently, limits output tokens and request size, times out provider calls, and cancels disconnected requests. Artwork has a separate process-wide limit of 10 attempts/hour and one concurrent image request; image calls time out after four minutes. Attempts can incur provider costs even if cancelled or unsuccessful. The key is sent only from the server to OpenRouter, never to the browser. Error messages do not echo upstream payloads or credentials.
 
 These controls are **not user authentication** or a durable billing system. Do not expose the Vite preview publicly without adding authenticated users, persistent per-user budgets, HTTPS, production hosting, and appropriate privacy/legal policies. Restarting the API resets its in-memory rate limit. The supplied key was posted in chat; rotate it after testing.
 

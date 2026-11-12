@@ -11,8 +11,10 @@
     "test": "node --test src/*.test.js server/*.test.js"
   },
   "dependencies": {
+    "docx": "9.5.1",
     "fflate": "0.8.3",
     "lucide-react": "0.468.0",
+    "pdfmake": "0.2.23",
     "react": "19.1.1",
     "react-dom": "19.1.1"
   },
